@@ -1,0 +1,15 @@
+[project]
+name = "trendcn"
+version = "0.1.0"
+description = "GitHub Trending 中文榜 — 每日自动抓取 GitHub Trending 并翻译为中文"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.28",
+    "beautifulsoup4>=4.11",
+    "lxml>=4.9",
+    "httpx>=0.24",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
