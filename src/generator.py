@@ -72,6 +72,40 @@ def generate_html(data: dict, updated_at: str, since: str = "daily", output_file
         weekly_active = ""
         monthly_active = " active"
 
+    # 读取打赏名单
+    donors_path = os.path.join(os.path.dirname(OUTPUT_DIR), "data", "donors.json")
+    donors = []
+    try:
+        with open(donors_path, "r", encoding="utf-8") as f:
+            donors = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+
+    # 生成打赏名单卡片
+    donor_cards = ""
+    for d in donors:
+        name = d.get("name", "匿名")
+        msg = d.get("message", "")
+        amt = d.get("amount", "")
+        date = d.get("date", "")
+        badge = f"<span class=\"donor-amount\">{amt}</span>" if amt else ""
+        donor_cards += f"""
+        <div class="donor-card">
+            <div class="donor-avatar">{name[0]}</div>
+            <div class="donor-info">
+                <div class="donor-name">{name}</div>
+                <div class="donor-msg">{msg}</div>
+            </div>
+            {badge}
+        </div>"""
+    if not donor_cards:
+        donor_cards = """
+        <div class="donor-card donor-empty">
+            <div class="donor-info">
+                <div class="donor-msg">还没有打赏记录 &#x1F64F; 成为第一个赞助者吧</div>
+            </div>
+        </div>"""
+
     # 更新时间
     try:
         dt = datetime.fromisoformat(updated_at)
@@ -327,6 +361,77 @@ def generate_html(data: dict, updated_at: str, since: str = "daily", output_file
         }}
         .donate a:hover {{ border-color: var(--accent); }}
 
+        /* Donors section */
+        .donors-section {{
+            max-width: var(--max-width); margin: 0 auto; padding: 32px 20px 0;
+        }}
+        .donors-grid {{
+            display: flex; flex-direction: column; gap: 8px;
+        }}
+        .donor-card {{
+            display: flex; align-items: center; gap: 12px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 12px 16px;
+        }}
+        .donor-empty {{
+            justify-content: center; opacity: 0.6;
+        }}
+        .donor-avatar {{
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, #f0883e, #d29922);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
+        }}
+        .donor-info {{
+            flex: 1;
+        }}
+        .donor-name {{
+            font-size: 14px; font-weight: 600; color: var(--text);
+        }}
+        .donor-msg {{
+            font-size: 12px; color: var(--text-secondary);
+        }}
+        .donor-amount {{
+            font-size: 13px; font-weight: 600; color: var(--star);
+            background: rgba(210, 153, 34, 0.1); padding: 4px 10px;
+            border-radius: 12px; flex-shrink: 0;
+        }}
+
+        /* Modal */
+        .modal-overlay {{
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.6);
+            z-index: 9999; align-items: center; justify-content: center;
+        }}
+        .modal-overlay.show {{
+            display: flex;
+        }}
+        .modal-content {{
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 32px; max-width: 360px;
+            width: 90%; position: relative; text-align: center;
+        }}
+        .modal-close {{
+            position: absolute; top: 12px; right: 16px; background: none;
+            border: none; color: var(--text-secondary); font-size: 24px;
+            cursor: pointer;
+        }}
+        .modal-close:hover {{ color: var(--text); }}
+        .modal-content h3 {{
+            font-size: 20px; margin-bottom: 8px;
+        }}
+        .qrcode-box {{
+            width: 200px; height: 200px; margin: 0 auto;
+            background: #fff; border-radius: 8px; display: flex;
+            align-items: center; justify-content: center;
+        }}
+        .qrcode-placeholder {{
+            text-align: center; color: #999; font-size: 13px; line-height: 1.6;
+        }}
+        .qrcode-placeholder code {{
+            background: #eee; padding: 1px 4px; border-radius: 3px; font-size: 12px;
+        }}
+
         /* Responsive */
         @media (min-width: 768px) {{
             header h1 {{ font-size: 34px; }}
@@ -367,11 +472,45 @@ def generate_html(data: dict, updated_at: str, since: str = "daily", output_file
         </section>
 
         {lang_sections}
+
+    <!-- 感谢打赏 -->
+    <section class="donors-section">
+        <div class="container">
+            <h2 class="lang-title" style="border-left: 4px solid var(--star); padding-left: 12px; margin-bottom: 16px;">
+                &#x2764;&#xFE0F; 感谢打赏
+            </h2>
+            <div class="donors-grid">
+                {donor_cards}
+            </div>
+        </div>
+    </section>
+
+    <!-- 打赏弹窗 -->
+    <div class="modal-overlay" id="donateModal" onclick="closeDonateModal(event)">
+        <div class="modal-content">
+            <button class="modal-close" onclick="document.getElementById('donateModal').classList.remove('show')">&times;</button>
+            <h3>&#x2764;&#xFE0F; 赞助支持</h3>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 16px;">
+                如果这个项目对你有帮助，欢迎打赏支持持续更新 &#x1F64F;
+            </p>
+            <div class="qrcode-box">
+                <div class="qrcode-placeholder">
+                    <span>请将支付宝收款码<br>保存为 <code>assets/alipay-qr.png</code></span>
+                </div>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 12px; margin-top: 12px;">
+                打赏后请留言你的昵称，我会把你加入感谢名单 &#x1F60A;
+            </p>
+        </div>
+    </div>
     </main>
 
     <footer>
         <div class="container">
             <div class="donate">
+                <a href="javascript:void(0)" onclick="document.getElementById('donateModal').classList.add('show')">
+                    &#x1F4B0; 支付宝打赏
+                </a>
                 <a href="https://afdian.com/a/celandine410" target="_blank" rel="noopener">
                     &#x2764;&#xFE0F; 爱发电赞助
                 </a>
@@ -386,6 +525,13 @@ def generate_html(data: dict, updated_at: str, since: str = "daily", output_file
             </p>
         </div>
     </footer>
+<script>
+function closeDonateModal(e) {{
+    if (e.target === e.currentTarget) {{
+        document.getElementById('donateModal').classList.remove('show');
+    }}
+}}
+</script>
 </body>
 </html>"""
 
