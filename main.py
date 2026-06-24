@@ -48,14 +48,39 @@ def run(since: str = "daily", use_cache: bool = False):
     # Step 3: 生成页面
     print("\n[3/3] 生成静态页面")
     updated_at = datetime.now().isoformat()
+    output_map = {"daily": "index.html", "weekly": "weekly.html", "monthly": "monthly.html"}
+    out_file = output_map.get(since, "index.html")
     generate_html(
         data={lang: [r.to_dict() if hasattr(r, 'to_dict') else r for r in repos]
               for lang, repos in data.items()},
         updated_at=updated_at,
         since=since,
+        output_file=out_file,
     )
 
-    print(f"\n[DONE] 完成！页面已生成到 docs/ 目录")
+    print(f"\n[DONE] 页面已生成到 docs/{out_file}")
+
+    # 如果是 daily 模式，顺便把另外两个时间范围也生成
+    if since == "daily":
+        for extra_since, extra_file in [("weekly", "weekly.html"), ("monthly", "monthly.html")]:
+            print(f"\n--- 同时生成 {extra_since} 页面 ---")
+            try:
+                extra_data = fetch_all_trending(extra_since)
+                for lang in extra_data:
+                    repos = extra_data[lang]
+                    if repos:
+                        batch_translate(repos)
+                generate_html(
+                    data={lang: [r.to_dict() if hasattr(r, 'to_dict') else r for r in repos]
+                          for lang, repos in extra_data.items()},
+                    updated_at=datetime.now().isoformat(),
+                    since=extra_since,
+                    output_file=extra_file,
+                )
+                print(f"  [DONE] 页面已生成到 docs/{extra_file}")
+            except Exception as e:
+                print(f"  [FAIL] 生成 {extra_since} 页面失败: {e}")
+
     return data
 
 

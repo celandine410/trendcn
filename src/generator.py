@@ -47,10 +47,11 @@ def _language_color(lang: str) -> str:
     return colors.get(lang.lower(), "#6e7681")
 
 
-def generate_html(data: dict, updated_at: str, since: str = "daily"):
+def generate_html(data: dict, updated_at: str, since: str = "daily", output_file: str = "index.html"):
     """
     生成静态 HTML 页面
     data: { language_name: [repo_dicts] }
+    output_file: 输出的文件名 (如 index.html, weekly.html, monthly.html)
     """
     Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
 
@@ -382,8 +383,8 @@ def generate_html(data: dict, updated_at: str, since: str = "daily"):
 </body>
 </html>"""
 
-    with open(os.path.join(OUTPUT_DIR, "index.html"), "w", encoding="utf-8") as f:
+    with open(os.path.join(OUTPUT_DIR, output_file), "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"  [OK] 页面已生成: {OUTPUT_DIR}/index.html ({len(html)} bytes)")
+    print(f"  [OK] 页面已生成: {OUTPUT_DIR}/{output_file} ({len(html)} bytes)")
 
     return html
