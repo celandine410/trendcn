@@ -327,6 +327,22 @@ def generate_html(data: dict, updated_at: str, since: str = "daily", output_file
         }}
         .donate a:hover {{ border-color: var(--accent); }}
 
+        /* Guide box */
+        .guide {{
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 12px 16px; margin: 12px 0;
+            font-size: 13px; color: var(--text-secondary);
+            display: flex; flex-wrap: wrap; gap: 16px; align-items: center;
+        }}
+        .guide-item {{
+            display: inline-flex; align-items: center; gap: 6px;
+        }}
+        .guide-key {{
+            background: var(--bg); border: 1px solid var(--border);
+            padding: 1px 6px; border-radius: 4px; font-size: 11px;
+            font-weight: 600; color: var(--text);
+        }}
+
         /* Responsive */
         @media (min-width: 768px) {{
             header h1 {{ font-size: 34px; }}
@@ -342,6 +358,11 @@ def generate_html(data: dict, updated_at: str, since: str = "daily", output_file
             <div class="meta">
                 <span>🕐 更新于 {time_str}</span>
                 <span>📊 共 {sum(len(v) for v in data.values())} 个仓库</span>
+            </div>
+            <div class="guide">
+                <span class="guide-item">👆 <span class="guide-key">点击标签</span> 按语言筛选</span>
+                <span class="guide-item">🕐 <span class="guide-key">今日/本周/本月</span> 切换时间范围</span>
+                <span class="guide-item">📦 <span class="guide-key">点击仓库名</span> 跳转到 GitHub</span>
             </div>
             <div class="time-nav">
                 <a href="index.html" class="time-btn{daily_active}">今日热榜</a>
