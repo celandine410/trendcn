@@ -316,6 +316,16 @@ def generate_html(data: dict, updated_at: str, since: str = "daily", output_file
         }}
         footer a {{ color: var(--accent); text-decoration: none; }}
         footer a:hover {{ text-decoration: underline; }}
+        .donate {{
+            margin: 16px 0; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;
+        }}
+        .donate a {{
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 20px; border-radius: 8px;
+            background: var(--surface); border: 1px solid var(--border);
+            color: var(--text); text-decoration: none; font-size: 14px;
+        }}
+        .donate a:hover {{ border-color: var(--accent); }}
 
         /* Responsive */
         @media (min-width: 768px) {{
@@ -361,6 +371,14 @@ def generate_html(data: dict, updated_at: str, since: str = "daily", output_file
 
     <footer>
         <div class="container">
+            <div class="donate">
+                <a href="https://afdian.com/a/celandine410" target="_blank" rel="noopener">
+                    &#x2764;&#xFE0F; 爱发电赞助
+                </a>
+                <a href="https://github.com/celandine410/trendcn" target="_blank" rel="noopener">
+                    &#x2B50; GitHub 开源
+                </a>
+            </div>
             <p>
                 <a href="https://github.com/celandine410/trendcn">TrendCN</a> —
                 每天自动抓取 GitHub Trending 并翻译为中文 ·
