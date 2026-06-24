@@ -120,7 +120,7 @@ def generate_html(data: dict, updated_at: str, since: str = "daily"):
             </div>"""
 
         lang_sections += f"""
-        <section class="lang-section">
+        <section class="lang-section" id="lang-{lang_label}">
             <h2 class="lang-title" style="border-left: 4px solid {lang_color}; padding-left: 12px;">
                 {lang_display}
                 <span class="count-badge">{len(repos)}</span>
