@@ -58,10 +58,19 @@ def generate_html(data: dict, updated_at: str, since: str = "daily", output_file
     # 时间标签
     if since == "daily":
         since_label = "今日"
+        daily_active = " active"
+        weekly_active = ""
+        monthly_active = ""
     elif since == "weekly":
         since_label = "本周"
+        daily_active = ""
+        weekly_active = " active"
+        monthly_active = ""
     else:
         since_label = "本月"
+        daily_active = ""
+        weekly_active = ""
+        monthly_active = " active"
 
     # 更新时间
     try:
@@ -335,9 +344,9 @@ def generate_html(data: dict, updated_at: str, since: str = "daily", output_file
                 <span>📊 共 {sum(len(v) for v in data.values())} 个仓库</span>
             </div>
             <div class="time-nav">
-                <a href="index.html" class="time-btn active">今日热榜</a>
-                <a href="weekly.html" class="time-btn">本周热榜</a>
-                <a href="monthly.html" class="time-btn">本月热榜</a>
+                <a href="index.html" class="time-btn{daily_active}">今日热榜</a>
+                <a href="weekly.html" class="time-btn{weekly_active}">本周热榜</a>
+                <a href="monthly.html" class="time-btn{monthly_active}">本月热榜</a>
             </div>
             <div class="lang-nav">
                 {lang_nav}
